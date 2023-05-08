@@ -6,34 +6,26 @@
 
 using namespace std;
 
-// Stack class to store strings and perform basic operations
-class StackOfString {
-private:
-    stack<string> s;
+class AbstractFileIO {
 public:
-    void push(string str) {
-        s.push(str);
-    }
-    string pop() {
-        string str = s.top();
-        s.pop();
-        return str;
-    }
-    bool isEmpty() {
-        return s.empty();
-    }
+    virtual void readAndWriteToFile(string inputFileName, string outputFileName) = 0;
+};
+
+// Stack class to store strings and perform basic operations
+class StackOfString : public stack<string> {
+public:
     void reverse() {
         stack<string> temp;
-        while (!s.empty()) {
-            temp.push(s.top());
-            s.pop();
+        while (!this->empty()) {
+            temp.push(this->top());
+            this->pop();
         }
-        s = temp;
+        stack<string>::operator=(temp);
     }
 };
 
 // Class to read and write strings to files using iterators
-class FileIO {
+class FileIO : AbstractFileIO {
 public:
     void readAndWriteToFile(string inputFileName, string outputFileName) {
         ifstream inputFile(inputFileName);
@@ -57,9 +49,12 @@ public:
         ofstream outputFile(outputFileName);
         ostream_iterator<string> outputIt(outputFile, "\n");
 
-        while (!lines.isEmpty()) {
-            string line = lines.pop();
+        lines.reverse();
+
+        while (!lines.empty()) {
+            string line = lines.top();
             *outputIt++ = line;
+            lines.pop();
         }
 
         outputFile.close();
@@ -68,20 +63,8 @@ public:
 
 
 int main() {
-    /*StackOfString s;
-    s.push("hello");
-    s.push("world");
-    s.push("!");
-    s.reverse();
-
-    while (!s.isEmpty()) {
-        cout << s.pop() << " ";
-    }
-    cout << endl;*/
-
     FileIO f;
     f.readAndWriteToFile("firstFile.txt", "output.txt");
-
 
     return 0;
 }
